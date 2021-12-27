@@ -1,0 +1,5 @@
+CREATE TABLE state(
+    temperature numeric,
+    humidity numeric,
+    datetime timestamp
+);

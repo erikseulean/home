@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  app:
+    stdin_open: true
+    tty: true
+    build: .
+    environment: 
+      - FLASK_APP=service/app.py
+    command: python3 -m flask run --host=0.0.0.0 --port=57633
+    ports:
+      - "57633:57633"
+    volumes:
+      - .:/python-flask
