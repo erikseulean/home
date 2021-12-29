@@ -8,8 +8,8 @@ from flask_login import current_user
 from flask_sqlalchemy import SQLAlchemy
 import psycopg2
 
-from .database_connection import config
-from . import db
+from service.database_connection import config
+from service import db
 
 DATABASE_CONFIG = config()
 
