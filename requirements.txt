@@ -3,3 +3,4 @@ flask-sqlalchemy;
 flask-login;
 flask-session;
 psycopg2;
+gunicorn;
