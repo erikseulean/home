@@ -1,6 +1,8 @@
 from decimal import Decimal
 from flask import Blueprint
 from flask import Flask
+from flask import make_response
+from flask import jsonify
 from flask import request
 from flask import render_template
 from flask_login import login_required
@@ -10,10 +12,32 @@ import psycopg2
 
 from service.database_connection import config
 from service import db
+from service import login_manager
 
 DATABASE_CONFIG = config()
 
 main = Blueprint("main", __name__)
+
+
+def respond(fullfilment):
+    return make_response(jsonify({
+        "payload": {
+            "google": {
+            "expectUserResponse": True,
+            "richResponse": {
+                "items": [
+                {
+                    "simpleResponse": {
+                    "textToSpeech": fullfilment
+                    }
+                }
+                ]
+            }
+            }
+        }
+        })
+    )
+    
 
 
 @main.route("/")
@@ -58,9 +82,19 @@ def set_state():
     return f"Temperature {temperature} and humidity {humidity} recorded."
 
 
-@main.route("/humidity")
+@main.route("/humidity", methods=["POST"])
 def get_humidity():
-    return f"Humidity is {45}"
+    if not current_user.is_authenticated:
+        return False
+    with psycopg2.connect(**DATABASE_CONFIG) as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT humidity, datetime 
+                FROM state order by datetime desc LIMIT 1;"""
+            )
+            state = cursor.fetchone()
+    return respond(f"Humidity is {state[0]}% at {state[1].strftime('%c')}.")
 
 
 if __name__ == "__main__":
